@@ -1,0 +1,7 @@
+{"first": {"base_dir": "/Swapan", "retention": 144000, "pattern": "*.xlsx",
+                             "local_directory": "C:\\Users\\Swapan\\Downloads\\FTP\\", "ftp_host": "ftp-emea.teoco.com",
+                             "ftp_id": "Airtel3G", "ftp_pw": "PocAg3"},
+                   "second": {"base_dir": "/Swapan", "retention": 144000, "pattern": "*.txt",
+                              "local_directory": "C:\\Users\\Swapan\\Downloads\\FTP1\\",
+                              "ftp_host": "ftp-emea.teoco.com", "ftp_id": "Airtel3G", "ftp_pw": "PocAg3"}}
+
