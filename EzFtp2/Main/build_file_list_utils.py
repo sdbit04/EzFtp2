@@ -46,9 +46,11 @@ class BuildFileListUtil(object):
             return 12
 
     # We will run the following method for each dir or file obtained from ftp server
+    # dir_check() takes a dir-with-its-attributes-list, if it is file then add into list
+    # if it is a directory then, it search recursively for all directory and files.
     @staticmethod
     def dir_checker(base_dir, each_dir_attrbt_list=[], file_list_to_downloaed=[],
-                    retention_minutes = 60,
+                    retention_minutes = 600,
                     file_pattern="*.*"):
         oldest_time_under_retention = (datetime.datetime.now() - datetime.timedelta(minutes=retention_minutes))
         if each_dir_attrbt_list[0].startswith('d'):
@@ -67,14 +69,29 @@ class BuildFileListUtil(object):
             # ['-rw-rw----', '1', 'Airtel3G', 'ftpuser', '8746', 'Aug', '22', '09:51', 'test6.xlsx']
             if fnmatch.fnmatch(each_dir_attrbt_list[-1], pat=file_pattern):
                 # file_time =
-                # print(each_dir_attrbt_list)
-                file_time = datetime.datetime(2018, BuildFileListUtil.mon2mm((each_dir_attrbt_list[5])), int(each_dir_attrbt_list[6]),
-                                              int(each_dir_attrbt_list[7].split(':')[0]),
-                                              int(each_dir_attrbt_list[7].split(':')[1]), second=00, microsecond=0000)
+                print(each_dir_attrbt_list)
+                # TODO Need to identify year of the file modification time
+                file_time = datetime.datetime(2019, month=BuildFileListUtil.mon2mm((each_dir_attrbt_list[5])), day=int(each_dir_attrbt_list[6]),
+                                              hour=int(each_dir_attrbt_list[7].split(':')[0]),
+                                              minute=int(each_dir_attrbt_list[7].split(':')[1]), second=00, microsecond=0000)
+                print(file_time)
+                print(oldest_time_under_retention)
+
                 if file_time > oldest_time_under_retention:
                     # print(each_dir_attrbt_list[-1])
                     each_dir_attrbt_list[-1] = base_dir + "/" + each_dir_attrbt_list[-1]
                     file_list_to_downloaed.extend(each_dir_attrbt_list[-1:])
 
         return file_list_to_downloaed
+
+
+if __name__ == "__main__":
+    bfl = BuildFileListUtil()
+
+    base_dir, list_of_files_attr_list = bfl.get_dir_list_ftp_server("/Swapan")
+    print(list_of_files_attr_list)
+    final_list = []
+    for dir in list_of_files_attr_list:
+        final_list.extend(bfl.dir_checker(base_dir, dir))
+    print(final_list)
 
