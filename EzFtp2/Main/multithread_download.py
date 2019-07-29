@@ -1,62 +1,55 @@
+from EzFtp2.Main.final_list import *
 import time
-import ftplib
 from threading import *
 
 
-def download_files_1(file_list):
-    with ftplib.FTP(host='ftp-emea.teoco.com', user="Airtel3G", passwd="PocAg3") as ftp_con:
-        for R_filename in file_list:
-            print("{}\{}".format(r'E:\Python\Developement\EzFtp2\EzFtp2\Data_in', R_filename.split('/')[-1]))
-            # ftp_con.retrbinary("RETR" + file, open("{}\{}".format(self.local_dir, file.split('/')[-1]), 'wb').write)
-            ftp_con.retrbinary('RETR ' + R_filename,
-                               open("{}\{}".format(r'E:\Python\Developement\EzFtp2\EzFtp2\Data_in',
-                                                   R_filename.split('/')[-1]), 'wb').write)
+def check_run_time_thread_count():
+    while True:
+        AC = active_count()
+        if AC <= 1:
+            break
+        else:
+            print("{} Threads are running".format(AC))
+            time.sleep(2)
 
 
-def atest():
-    for i in range(10):
-        time.sleep(1)
-        print(i)
+def drive_the_download():
+    # TODO Create the object based on input parameters stored into xls.x file
+    bfl = BuildFileList(base_dir='/Swapan', retention=86400, pattern="*.*",
+                        local_directory=r'D:\D_drive_BACKUP\Study\PycharmProjects\EzFtp2\EzFtp2\Data_in',
+                        ftp_host='ftp-emea.teoco.com', ftp_id='Airtel3G', ftp_pw='PocAg3')
+    files_list = bfl.full_file_list()
+    print(files_list)
 
+    start_time = time.time()
+    files_per_thread = 3
+    file_count = len(files_list)
+    thread_count =0
+    files_in_additional_thread = 0
+    if file_count > files_per_thread:
+        thread_count = file_count // files_per_thread
+        files_in_additional_thread = file_count % files_per_thread
 
-def atest1():
-    for i in range(100, 110):
-        print(i)
-        time.sleep(1)
+    threads_list = []
+    for i in range(1,thread_count):
+        threads_list.append(Thread(target=bfl.download_files, args=[files_list[i*files_per_thread:i*files_per_thread + files_per_thread]]))
 
+    additional_thread = None
+    if files_in_additional_thread > 0:
+        additional_thread = Thread(target=bfl.download_files, args=[files_list[files_per_thread * thread_count:-1]])
 
-def atest2():
-    for i in range(10):
-        print(i)
-        time.sleep(1)
+    for thread in threads_list:
+        thread.start()
+    additional_thread.start()
+
+    check_run_time_thread_count()
+
+    for thread in threads_list:
+        thread.join()
+    additional_thread.join()
+
+    print("Elapsed time = {}".format(time.time() - start_time))
 
 
 if __name__ == "__main__":
-
-    files_list = ['/Swapan/testfiles/4.xlsx', '/Swapan/testfiles/a.txt', '/Swapan/testfiles/b.txt',
-                  '/Swapan/testfiles/c.pub', '/Swapan/testfiles/d.rtf', '/Swapan/testfiles/f.accdb',
-                  '/Swapan/testfiles/f.docx', '/Swapan/testfiles/g.bmp', '/Swapan/testfiles/g.docx',
-                  '/Swapan/testfiles/j.docx']
-
-    start_time = time.time()
-    # download_files_1(files_list)
-    # """"
-    t1 = Thread(target=download_files_1, args=[files_list[0:3]])
-    t2 = Thread(target=download_files_1, args=[files_list[3:6]])
-    t3 = Thread(target=download_files_1, args=[files_list[6:9]])
-    t4 = Thread(target=download_files_1, args=[files_list[9:-1]])
-
-    t2.start()
-    t3.start()
-    t4.start()
-    t1.start()
-    print(active_count())
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
-
-    # """
-    print("Elapsed time = {}".format(time.time()-start_time))
-
-
+    drive_the_download()

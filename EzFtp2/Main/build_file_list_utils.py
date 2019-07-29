@@ -5,13 +5,17 @@ import fnmatch
 Assumption all the files matching the downloading pattern are not older than 1 year 
 """
 
+
 class BuildFileListUtil(object):
 
+    def __init__(self, ftp_host, user, password):
+        self.ftp_host = ftp_host
+        self.user = user
+        self.passwrd = password
 
-    @staticmethod
-    def get_dir_list_ftp_server(base_dir):
+    def get_dir_list_ftp_server(self, base_dir):
         Dir_list = []
-        with ftplib.FTP(host="ftp-emea.teoco.com", user="Airtel3G", passwd="PocAg3") as ftp_con:
+        with ftplib.FTP(host=self.ftp_host, user=self.user, passwd=self.passwrd) as ftp_con:
             ftp_con.cwd(base_dir)
             # Swapan: In the line below split was not working correctly with maxsplit, later I explicitly mark the x as string then it work correct
             ftp_con.retrlines('LIST', lambda x='': Dir_list.append(x.split(maxsplit=8)))
@@ -48,19 +52,19 @@ class BuildFileListUtil(object):
     # We will run the following method for each dir or file obtained from ftp server
     # dir_check() takes a dir-with-its-attributes-list, if it is file then add into list
     # if it is a directory then, it search recursively for all directory and files.
-    @staticmethod
-    def dir_checker(base_dir, each_dir_attrbt_list=[], file_list_to_downloaed=[],
+
+    def dir_checker(self, base_dir, each_dir_attrbt_list=[], file_list_to_downloaed=[],
                     retention_minutes = 600,
                     file_pattern="*.*"):
         oldest_time_under_retention = (datetime.datetime.now() - datetime.timedelta(minutes=retention_minutes))
         if each_dir_attrbt_list[0].startswith('d'):
             # TODO: base_dir_name has become hard-coded by initial base-dir name, need to improve, done
-            base_dir_name, sub_dir_list_with_attributes = BuildFileListUtil.get_dir_list_ftp_server(
+            base_dir_name, sub_dir_list_with_attributes = self.get_dir_list_ftp_server(
                 base_dir + '/' + each_dir_attrbt_list[-1])
             # print(base_dir_name, end = "\t")
             # print(sub_dir_list_with_attributes)
             for sub_dir_attribute in sub_dir_list_with_attributes:
-                BuildFileListUtil.dir_checker(base_dir_name, sub_dir_attribute, file_list_to_downloaed, retention_minutes,
+                self.dir_checker(base_dir_name, sub_dir_attribute, file_list_to_downloaed, retention_minutes,
                             file_pattern)
         else:
             #         TODO: In case of file we need to do multiple tasks till ftp download
@@ -74,8 +78,8 @@ class BuildFileListUtil(object):
                 file_time = datetime.datetime(2019, month=BuildFileListUtil.mon2mm((each_dir_attrbt_list[5])), day=int(each_dir_attrbt_list[6]),
                                               hour=int(each_dir_attrbt_list[7].split(':')[0]),
                                               minute=int(each_dir_attrbt_list[7].split(':')[1]), second=00, microsecond=0000)
-                print(file_time)
-                print(oldest_time_under_retention)
+                # print(file_time)
+                # print(oldest_time_under_retention)
 
                 if file_time > oldest_time_under_retention:
                     # print(each_dir_attrbt_list[-1])
@@ -84,14 +88,4 @@ class BuildFileListUtil(object):
 
         return file_list_to_downloaed
 
-
-if __name__ == "__main__":
-    bfl = BuildFileListUtil()
-
-    base_dir, list_of_files_attr_list = bfl.get_dir_list_ftp_server("/Swapan")
-    print(list_of_files_attr_list)
-    final_list = []
-    for dir in list_of_files_attr_list:
-        final_list.extend(bfl.dir_checker(base_dir, dir))
-    print(final_list)
 
