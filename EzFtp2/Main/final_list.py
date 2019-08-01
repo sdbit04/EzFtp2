@@ -29,7 +29,7 @@ class BuildFileList(BuildFileListUtil):
         return full_list
 
     def download_files(self, file_list):
-        with ftplib.FTP(host=self.ftp_host, user="Airtel3G", passwd="PocAg3") as ftp_con:
+        with ftplib.FTP(host=self.ftp_host, user=self.ftp_id, passwd=self.ftp_pw) as ftp_con:
             for R_filename in file_list:
                 print("Downloading file : {}".format(R_filename.split('/')[-1]))
                 # print("downloading at {}\{}".format(self.local_dir, R_filename.split('/')[-1]))

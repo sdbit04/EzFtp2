@@ -13,11 +13,18 @@ def check_run_time_thread_count():
             time.sleep(2)
 
 
-def drive_the_download():
+def drive_the_download(base_dir, retention, pattern, local_directory, ftp_host, ftp_id, ftp_pw):
+    base_dir = base_dir
+    retention = retention
+    pattern = pattern
+    local_directory = local_directory
+    ftp_host = ftp_host
+    ftp_id = ftp_id
+    ftp_pw = ftp_pw
     # TODO Create the object based on input parameters stored into xls.x file
-    bfl = BuildFileList(base_dir='/Swapan', retention=86400, pattern="*.*",
-                        local_directory=r'D:\D_drive_BACKUP\Study\PycharmProjects\EzFtp2\EzFtp2\Data_in',
-                        ftp_host='ftp-emea.teoco.com', ftp_id='Airtel3G', ftp_pw='PocAg3')
+    bfl = BuildFileList(base_dir, retention, pattern,
+                        local_directory,
+                        ftp_host, ftp_id, ftp_pw)
     files_list = bfl.full_file_list()
     print(files_list)
 
@@ -52,4 +59,7 @@ def drive_the_download():
 
 
 if __name__ == "__main__":
-    drive_the_download()
+    job1 = ['/Swapan', 86400, "*.*", r'D:\D_drive_BACKUP\Study\PycharmProjects\EzFtp2\EzFtp2\Data_in','ftp-emea.teoco.com', 'Airtel3G', 'PocAg3' ]
+    drive_the_download(base_dir=job1[0], retention=job1[1], pattern=job1[2],
+                        local_directory=job1[3],
+                        ftp_host=job1[4], ftp_id=job1[5], ftp_pw=job1[6])
