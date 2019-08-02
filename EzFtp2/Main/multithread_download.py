@@ -1,6 +1,7 @@
 from EzFtp2.Main.final_list import *
 import time
 from threading import *
+from EzFtp2.Main.read_credential_from_xls import *
 
 
 def check_run_time_thread_count():
@@ -59,7 +60,10 @@ def drive_the_download(base_dir, retention, pattern, local_directory, ftp_host, 
 
 
 if __name__ == "__main__":
-    job1 = ['/Swapan', 86400, "*.*", r'D:\D_drive_BACKUP\Study\PycharmProjects\EzFtp2\EzFtp2\Data_in','ftp-emea.teoco.com', 'Airtel3G', 'PocAg3' ]
-    drive_the_download(base_dir=job1[0], retention=job1[1], pattern=job1[2],
-                        local_directory=job1[3],
-                        ftp_host=job1[4], ftp_id=job1[5], ftp_pw=job1[6])
+    # job1 = ['/Swapan', 86400, "*.*", r'D:\D_drive_BACKUP\Study\PycharmProjects\EzFtp2\EzFtp2\Data_in','ftp-emea.teoco.com', 'Airtel3G', 'PocAg3' ]
+    #
+    # drive_the_download(base_dir=job1[0], retention=job1[1], pattern=job1[2],
+    #                     local_directory=job1[3],
+    #                     ftp_host=job1[4], ftp_id=job1[5], ftp_pw=job1[6])
+
+    get_jobs_list_and_run(drive_the_download)
